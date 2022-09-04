@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="en-us"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>あるゲームのデータを解凍してみた | fantasia</title><meta name="description" content="あるゲームのデータを見たいけど内容が見れない助けてください、と言われたので試しました。"><meta name="generator" content="fantasia"><meta name="author" content="sdercolin"><meta name="keywords"><meta name="HandheldFriendly" content="True"><meta name="MobileOptimized" content="320"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=0"><link rel="stylesheet" type="text/css" href="/styles/screen.css"><link rel="apple-touch-icon" sizes="57x57" href="/images/apple-touch-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/images/apple-touch-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/images/apple-touch-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/images/apple-touch-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/images/apple-touch-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-180x180.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="128x128" href="/images/favicon-128.png"><link rel="icon" type="image/png" sizes="196x196" href="/images/favicon-196x196.png"><meta name="msapplication-TileColor" content="#FFFFFF"><meta name="msapplication-TileImage" content="mstile-144x144.png"><meta name="msapplication-square70x70logo" content="mstile-70x70.png"><meta name="msapplication-square150x150logo" content="mstile-150x150.png"><meta name="msapplication-wide310x150logo" content="mstile-310x150.png"><meta name="msapplication-square310x310logo" content="mstile-310x310.png"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body itemscope itemtype="https://schema.org/WebPage"><header itemscope itemtype="https://schema.org/WPHeader"><h1><a href="/" alt="fantasia" title="fantasia" itemprop="headline">fantasia</a></h1><p itemprop="description"></p><nav itemscope itemtype="https://schema.org/SiteNavigationElement"><ul><li itemprop="name"><a href="/ " alt="home" title="home" itemprop="url">home</a></li><li itemprop="name"><a href="/articles" alt="articles" title="articles" itemprop="url">articles</a></li><li itemprop="name"><a href="/author" alt="author" title="author" itemprop="url">author</a></li></ul></nav><div class="space"></div></header><main itemscope itemtype="https://schema.org/Blog"><article class="full"><h1 itemprop="headline" class="post-heading">あるゲームのデータを解凍してみた</h1><span class="page-tag-anchor"><a href="/tags/coding, cs" itemprop="url">#coding, cs
+&nbsp;&nbsp;</a></span><span class="post-meta"></span><br><br><p>あるゲームのデータを見たいけど内容が見れない助けてください、と言われたので試しました。</p>
+<p>渡されたファイルはばかでかい”.dat”と”.toc”の２つである。<br>datファイルはすべてのファイルを接続して作ったそうで、tocファイルはそのファイルたちの長さと名前を記述したもの。</p>
+<p>tocファイルの一部</p>
+<pre><code>      1dabe5 28 GeneratedSoundBanks\Switch\959055590.wem
+       f42f8 28 GeneratedSoundBanks\Switch\259128839.wem
+       edb2b 28 GeneratedSoundBanks\Switch\433205816.wem
+       c2e8c 24 GeneratedSoundBanks\Switch\bank0.bnk
+        6156 2d GeneratedSoundBanks\Switch\SoundbanksInfo.xml
+        5cb2 24 GeneratedSoundBanks\Switch\bank0.txt
+         3f6 23 GeneratedSoundBanks\Switch\Init.bnk
+         30b 23 GeneratedSoundBanks\Switch\Init.txt
+         10d 29 GeneratedSoundBanks\Switch\PluginInfo.xml
+</code></pre><p>1列目はファイルのサイズで3列目は名前。</p>
+<p>&nbsp;</p>
+<h2 id="解凍してみる"><a href="#解凍してみる" class="headerlink" title="解凍してみる"></a>解凍してみる</h2><p>さてとこれは簡単そうだな。</p>
+<pre class=" language-csharp"><code class="language-csharp"><span class="token comment" spellcheck="true">// C#</span>
+<span class="token keyword">var</span> size <span class="token operator">=</span> Convert<span class="token punctuation">.</span><span class="token function">ToInt32</span><span class="token punctuation">(</span>row<span class="token punctuation">.</span><span class="token function">Substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> name <span class="token operator">=</span> row<span class="token punctuation">.</span><span class="token function">Substring</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> bytes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>size<span class="token punctuation">]</span><span class="token punctuation">;</span>
+stream<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>bytes<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> dir <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInfo</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">.</span>Directory<span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>dir <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    Directory<span class="token punctuation">.</span><span class="token function">CreateDirectory</span><span class="token punctuation">(</span>dir<span class="token punctuation">.</span>FullName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+File<span class="token punctuation">.</span><span class="token function">WriteAllBytes</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>行ごとに以上のコード実行すれば行けるんじゃね？</p>
+<p>と思ったらだめだった。<br>解凍されたほとんどのファイルは開かない。</p>
+<p>&nbsp;</p>
+<h2 id="間違い探し"><a href="#間違い探し" class="headerlink" title="間違い探し"></a>間違い探し</h2><p>そこで詳しくファイルの内容を見る。</p>
+<p>幸い連続しているtxtとxmlファイルがあるので読める。<br>winhexでByte単位でよく見たらファイルの間に確かに<code>00</code>が追加されている。</p>
+<p>さらに計算してみたら記載されている全てのファイルのサイズの合計はdatのサイズよりも小さい。その差はファイル数の約1.46倍。</p>
+<p>んんん？？</p>
+<p>1.46倍？？？</p>
+<p>セパレータとして追加しているのではないのか？？</p>
+<p>…</p>
+<p>&nbsp;</p>
+<h2 id="とりあえず空白をskipしよう"><a href="#とりあえず空白をskipしよう" class="headerlink" title="とりあえず空白をskipしよう"></a>とりあえず空白をskipしよう</h2><p>一つのファイルを読み込んだ後、<code>00</code>を全部skipsして、初めて<code>00</code>ではないByteから次のファイルの読み込みを始めるというのはどうだろう。</p>
+<p>試したら、半分ぐらいのファイルは正しく解凍された！！！</p>
+<p>嬉しいけど。どうやらもともと<code>00</code>から始まるファイルがあるらしい。</p>
+<p>一体どうやって<code>00</code>の数を決めたんだ？？</p>
+<p>&nbsp;</p>
+<h2 id="こういう時はlogしよう"><a href="#こういう時はlogしよう" class="headerlink" title="こういう時はlogしよう"></a>こういう時はlogしよう</h2><p>とりあえずlog出してskipした<code>00</code>の数を見る。</p>
+<p>0,2,1,3,0,2,2,1,…</p>
+<p>あら？0~3ではないか。</p>
+<p>4の倍数になるため足してるのでは？？</p>
+<p>正解だった。</p>
+<p>ファイルのサイズ+空白の数=4の倍数になるように足しているのだ。</p>
+<p>そこまでわかったら簡単だよね。</p>
+<p>無事解凍できた。</p>
+<p>コード張るわ。</p>
+<pre class=" language-csharp"><code class="language-csharp"><span class="token comment" spellcheck="true">// C#</span>
+<span class="token keyword">using</span> System<span class="token punctuation">;</span>
+<span class="token keyword">using</span> System<span class="token punctuation">.</span>IO<span class="token punctuation">;</span>
+<span class="token keyword">using</span> System<span class="token punctuation">.</span>Linq<span class="token punctuation">;</span>
+
+<span class="token keyword">namespace</span> dat_unzipper
+<span class="token punctuation">{</span>
+    <span class="token keyword">internal</span> <span class="token keyword">class</span> <span class="token class-name">Program</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">Main</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">var</span> datPath <span class="token operator">=</span> <span class="token string">"DATA.dat"</span><span class="token punctuation">;</span>
+            <span class="token keyword">var</span> tocPath <span class="token operator">=</span> <span class="token string">"DATA.toc"</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">var</span> toc <span class="token operator">=</span> File<span class="token punctuation">.</span><span class="token function">ReadAllLines</span><span class="token punctuation">(</span>tocPath<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ToList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Skip</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">var</span> stream <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileStream</span><span class="token punctuation">(</span>datPath<span class="token punctuation">,</span> FileMode<span class="token punctuation">.</span>Open<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token keyword">var</span> row <span class="token keyword">in</span> toc<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">var</span> size <span class="token operator">=</span> Convert<span class="token punctuation">.</span><span class="token function">ToInt32</span><span class="token punctuation">(</span>row<span class="token punctuation">.</span><span class="token function">Substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> name <span class="token operator">=</span> row<span class="token punctuation">.</span><span class="token function">Substring</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">Format</span><span class="token punctuation">(</span><span class="token string">"Reading {0} of {1} bytes..."</span><span class="token punctuation">,</span> name<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> bytes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>size<span class="token punctuation">]</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> read <span class="token operator">=</span> stream<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>bytes<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>read <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">EndOfStreamException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">var</span> dir <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInfo</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">.</span>Directory<span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>dir <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    Directory<span class="token punctuation">.</span><span class="token function">CreateDirectory</span><span class="token punctuation">(</span>dir<span class="token punctuation">.</span>FullName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                File<span class="token punctuation">.</span><span class="token function">WriteAllBytes</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">Format</span><span class="token punctuation">(</span><span class="token string">"Successfully written {0}."</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                <span class="token keyword">var</span> blankCount <span class="token operator">=</span> <span class="token number">4</span> <span class="token operator">-</span> size <span class="token operator">%</span> <span class="token number">4</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>blankCount <span class="token operator">==</span> <span class="token number">4</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    <span class="token keyword">continue</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">var</span> skip <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>blankCount<span class="token punctuation">]</span><span class="token punctuation">;</span>
+                stream<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>skip<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> blankCount<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">Format</span><span class="token punctuation">(</span><span class="token string">"Skipped {0} blank byte for {1} bytes."</span><span class="token punctuation">,</span> blankCount<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            stream<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>&nbsp;</p>
+<h2 id="復元しろって？？"><a href="#復元しろって？？" class="headerlink" title="復元しろって？？"></a>復元しろって？？</h2><p>案の定復元も頼まれた。</p>
+<p>構造を知った以上なんの問題もなく書けるつもりだったけど問題が１つあった。</p>
+<p>Windows環境で<code>.WriteLine</code>したらCRLFになるけど、tocファイルはLFだった。</p>
+<p>なぜかnodepad++はCRLFだと教えてたんだけどね…<br>winhexで確認したほうが確実。</p>
+<p>以下コード。</p>
+<pre class=" language-csharp"><code class="language-csharp"><span class="token comment" spellcheck="true">// C#</span>
+<span class="token keyword">using</span> System<span class="token punctuation">;</span>
+<span class="token keyword">using</span> System<span class="token punctuation">.</span>IO<span class="token punctuation">;</span>
+<span class="token keyword">using</span> System<span class="token punctuation">.</span>Linq<span class="token punctuation">;</span>
+
+<span class="token keyword">namespace</span> dat_zipper
+<span class="token punctuation">{</span>
+    <span class="token keyword">internal</span> <span class="token keyword">class</span> <span class="token class-name">Program</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">Main</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">var</span> datOutPath <span class="token operator">=</span> <span class="token string">"DATA_OUT.dat"</span><span class="token punctuation">;</span>
+            <span class="token keyword">var</span> tocPath <span class="token operator">=</span> <span class="token string">"DATA.toc"</span><span class="token punctuation">;</span>
+            <span class="token keyword">var</span> tocOutPath <span class="token operator">=</span> <span class="token string">"DATA_OUT.toc"</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">var</span> toc <span class="token operator">=</span> File<span class="token punctuation">.</span><span class="token function">ReadAllLines</span><span class="token punctuation">(</span>tocPath<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ToList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">var</span> tocWriter <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StreamWriter</span><span class="token punctuation">(</span>tocOutPath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>toc<span class="token punctuation">.</span><span class="token function">First</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">var</span> datWriter <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BinaryWriter</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileStream</span><span class="token punctuation">(</span>datOutPath<span class="token punctuation">,</span> FileMode<span class="token punctuation">.</span>Create<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token keyword">var</span> row <span class="token keyword">in</span> toc<span class="token punctuation">.</span><span class="token function">Skip</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">var</span> nameSizeHex <span class="token operator">=</span> row<span class="token punctuation">.</span><span class="token function">Substring</span><span class="token punctuation">(</span><span class="token number">13</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> name <span class="token operator">=</span> row<span class="token punctuation">.</span><span class="token function">Substring</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">Format</span><span class="token punctuation">(</span><span class="token string">"Reading file: {0} ..."</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> file <span class="token operator">=</span> File<span class="token punctuation">.</span><span class="token function">ReadAllBytes</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> size <span class="token operator">=</span> file<span class="token punctuation">.</span>Length<span class="token punctuation">;</span>
+                <span class="token keyword">var</span> sizeString <span class="token operator">=</span> size<span class="token punctuation">.</span><span class="token function">ToString</span><span class="token punctuation">(</span><span class="token string">"x"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> prefixBlankCount <span class="token operator">=</span> <span class="token number">12</span> <span class="token operator">-</span> sizeString<span class="token punctuation">.</span>Length<span class="token punctuation">;</span>
+                <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> prefixBlankCount<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>sizeString<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>nameSizeHex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                tocWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> bytes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>size<span class="token punctuation">]</span><span class="token punctuation">;</span>
+                datWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>file<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">var</span> suffixBlankCount <span class="token operator">=</span> <span class="token number">4</span> <span class="token operator">-</span> size <span class="token operator">%</span> <span class="token number">4</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>suffixBlankCount <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> suffixBlankCount<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">{</span>
+                        <span class="token keyword">byte</span> blankByte <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                        datWriter<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>blankByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">Format</span><span class="token punctuation">(</span><span class="token string">"Added {0} blank byte for {1} bytes."</span><span class="token punctuation">,</span> suffixBlankCount<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span><span class="token keyword">string</span><span class="token punctuation">.</span><span class="token function">Format</span><span class="token punctuation">(</span><span class="token string">"Successfully written {0}."</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            tocWriter<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            datWriter<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>はいおつかれさまでした！</p>
+</article><br><br><span class="next-post"><a href="/posts/yanagi-migration/" itemprop="url">Older Post ⇒</a></span><span class="prev-post"><a href="/posts/my-dev-2022/" itemprop="url">⇐ Next Post </a></span><br><br><br></main></body></html>
